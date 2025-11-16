@@ -1,41 +1,80 @@
-.App {
-  text-align: center;
+/* 전체 배경 */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f6f5f3; /* 밝은 따뜻한 톤 */
+  font-family: "Pretendard", sans-serif;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* 중앙 정렬용 컨테이너 */
+.container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 로그인 박스 */
+.login-box {
+  background: #ffffff;
+  padding: 40px;
+  width: 320px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  gap: 18px;
+}
+
+/* 타이틀 */
+.title {
+  text-align: center;
+  color: #444;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+/* 인풋 스타일 */
+.login-box input {
+  padding: 12px;
+  border: 1.5px solid #ddd;
+  border-radius: 10px;
+  font-size: 15px;
+  background-color: #fafafa;
+  transition: 0.2s;
+}
+
+.login-box input:focus {
+  border-color: #d78f5a;
+  outline: none;
+  background-color: #fff;
+}
+
+/* 버튼 */
+.login-box button {
+  padding: 12px;
+  background-color: #d78f5a; /* 따뜻한 카멜톤 */
   color: white;
-}
-
-input {
-  padding: 8px;
-  font-size: 16px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-
-button {
-  padding: 10px;
-  font-size: 16px;
-  background-color: #61dafb;
   border: none;
-  border-radius: 4px;
-  color: black;
+  border-radius: 10px;
+  font-size: 16px;
   cursor: pointer;
+  transition: 0.2s;
 }
 
-button:hover {
-  background-color: #21a1f1;
+.login-box button:hover {
+  background-color: #c47d4e;
 }
 
-.switch-link {
-  margin-top: 10px;
-  cursor: pointer;
-  color: #61dafb;
+/* 로그인 성공 메시지 */
+.welcome {
+  color: #333;
+  font-weight: 600;
+}
+
+.success-text {
+  color: #d78f5a;
+  font-weight: 600;
+  margin-top: 8px;
+  text-align: center;
 }
