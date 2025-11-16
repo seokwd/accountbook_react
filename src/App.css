@@ -1,26 +1,21 @@
-/* 전체 배경 */
-body {
-  margin: 0;
-  padding: 0;
-  background-color: #f6f5f3; /* 밝은 따뜻한 톤 */
-  font-family: "Pretendard", sans-serif;
+.App {
+  text-align: center;
 }
 
-/* 중앙 정렬용 컨테이너 */
-.container {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
 }
 
-/* 로그인 박스 */
-.login-box {
-  background: #ffffff;
-  padding: 40px;
-  width: 320px;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -62,19 +57,15 @@ body {
   transition: 0.2s;
 }
 
-.login-box button:hover {
-  background-color: #c47d4e;
+.App-link {
+  color: #61dafb;
 }
 
-/* 로그인 성공 메시지 */
-.welcome {
-  color: #333;
-  font-weight: 600;
-}
-
-.success-text {
-  color: #d78f5a;
-  font-weight: 600;
-  margin-top: 8px;
-  text-align: center;
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
