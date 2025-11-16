@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import "./App.css";
 
 function App() {
@@ -6,14 +7,28 @@ function App() {
   const [pw, setPw] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const handleLogin = (e) => {
+  const BASE_URL = "https://unlionised-unincreasing-axel.ngrok-free.dev"; // 네 백엔드 주소
+
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    if (id === "test" && pw === "1234") {
+    try {
+      const response = await axios.post(`${BASE_URL}/user/login`, {
+        email: id,
+        password: pw
+      });
+
+      console.log("로그인 성공:", response.data);
       setSuccess(true);
-    } else {
+
+    } catch (error) {
       setSuccess(false);
-      alert("아이디 또는 비밀번호가 틀렸습니다!");
+
+      if (error.response) {
+        alert(error.response.data.error);
+      } else {
+        alert("서버 연결 오류!");
+      }
     }
   };
 
@@ -24,7 +39,7 @@ function App() {
 
         <input
           type="text"
-          placeholder="아이디"
+          placeholder="아이디(이메일)"
           value={id}
           onChange={(e) => setId(e.target.value)}
         />
@@ -38,7 +53,6 @@ function App() {
 
         <button type="submit">로그인</button>
 
-        {/* 로그인 성공 메시지 */}
         {success && <p className="success-text">로그인 성공!</p>}
       </form>
     </div>
@@ -46,5 +60,3 @@ function App() {
 }
 
 export default App;
-
-/*수정*/
