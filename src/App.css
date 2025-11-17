@@ -8,13 +8,14 @@ body {
 
 /* 중앙 정렬용 컨테이너 */
 .container {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
-/* 로그인 박스 */
+/* 로그인/회원가입 박스 */
 .login-box {
   background: #ffffff;
   padding: 40px;
@@ -35,7 +36,7 @@ body {
 }
 
 /* 인풋 스타일 */
-.login-box input {
+.login-box input, .login-box select {
   padding: 12px;
   border: 1.5px solid #ddd;
   border-radius: 10px;
@@ -44,7 +45,7 @@ body {
   transition: 0.2s;
 }
 
-.login-box input:focus {
+.login-box input:focus, .login-box select:focus {
   border-color: #d78f5a;
   outline: none;
   background-color: #fff;
@@ -53,7 +54,7 @@ body {
 /* 버튼 */
 .login-box button {
   padding: 12px;
-  background-color: #d78f5a; /* 따뜻한 카멜톤 */
+  background-color: #d78f5a;
   color: white;
   border: none;
   border-radius: 10px;
@@ -67,14 +68,61 @@ body {
 }
 
 /* 로그인 성공 메시지 */
-.welcome {
-  color: #333;
-  font-weight: 600;
-}
-
 .success-text {
   color: #d78f5a;
   font-weight: 600;
   margin-top: 8px;
   text-align: center;
+}
+
+/* 가계부 화면 */
+.accountbook-container {
+  width: 80%;
+  max-width: 900px;
+}
+
+.accountbook-container header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.accountbook-container .tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.accountbook-container .tabs button {
+  flex: 1;
+}
+
+.accountbook-container .summary {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.accountbook-container .entry-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.accountbook-container .entry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.entry-card {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #fafafa;
+  border-radius: 10px;
+  border: 1px solid #ddd;
 }
