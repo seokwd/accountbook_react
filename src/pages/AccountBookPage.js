@@ -1,37 +1,71 @@
-import React, { useState } from "react";
+// pages/AccountBookPage.js
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 function AccountBookPage({ onLogout }) {
-  const [view, setView] = useState("물품");
+  const [view, setView] = useState("수입");
   const [entryType, setEntryType] = useState("수입");
   const [category, setCategory] = useState("");
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [entries, setEntries] = useState([]);
+  const [categories, setCategories] = useState({ 수입: [], 지출: [], 물품: [] });
 
-  const categoriesMap = {
-    수입: ["월급", "용돈", "기타수입"],
-    지출: ["식비", "교통비", "쇼핑", "기타지출"],
-    물품: ["식료품", "생활용품", "기타물품"],
-  };
+  const BASE_URL = "https://unlionised-unincreasing-axel.ngrok-free.dev";
 
-  const handleAdd = () => {
+  // 서버에서 카테고리 불러오기
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/category`); // <- 수정된 URL
+        const map = { 수입: [], 지출: [], 물품: [] };
+        res.data.forEach(cat => {
+          if (cat.type === "income") map["수입"].push(cat);
+          if (cat.type === "expense") map["지출"].push(cat);
+          if (cat.type === "item") map["물품"].push(cat);
+        });
+        setCategories(map);
+      } catch (err) {
+        console.error("카테고리 불러오기 실패:", err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const handleAdd = async () => {
     if (!category || !amount) {
       alert("카테고리와 금액을 입력해주세요.");
       return;
     }
-    const newEntry = {
-      type: entryType,
-      category,
-      amount: Number(amount),
-      note,
-    };
-    setEntries([newEntry, ...entries]);
-    setCategory("");
-    setAmount("");
-    setNote("");
+
+    try {
+      const categoryId = category.category_id; // 선택한 category 객체에서 ID
+      const newEntry = {
+        type: entryType,
+        category_id: categoryId,
+        amount: Number(amount),
+        note,
+      };
+
+      const res = await axios.post(`${BASE_URL}/transactions`, newEntry);
+      setEntries([res.data, ...entries]);
+      setCategory("");
+      setAmount("");
+      setNote("");
+    } catch (err) {
+      console.error("추가 실패:", err.response?.data || err);
+      alert("추가 실패!");
+    }
   };
 
-  const filteredEntries = entries.filter((e) => e.type === view);
+  const entryTypeMap = (type) => {
+    if (type === "income") return "수입";
+    if (type === "expense") return "지출";
+    if (type === "item") return "물품";
+    return type;
+  };
+
+  const filteredEntries = entries.filter((e) => entryTypeMap(e.type) === view);
 
   return (
     <div className="page-container">
@@ -54,19 +88,26 @@ function AccountBookPage({ onLogout }) {
 
         {/* 입력 영역 */}
         <div className="input-row">
-          <select
-            value={entryType}
-            onChange={(e) => setEntryType(e.target.value)}
-          >
+          <select value={entryType} onChange={(e) => setEntryType(e.target.value)}>
             <option value="수입">수입</option>
             <option value="지출">지출</option>
             <option value="물품">물품</option>
           </select>
 
-          <select value={category} onChange={(e) => setCategory(e.target.value)}>
+          <select
+            value={category.category_id || ""}
+            onChange={(e) => {
+              const selected = categories[entryType].find(
+                (c) => c.category_id === Number(e.target.value)
+              );
+              setCategory(selected);
+            }}
+          >
             <option value="">선택</option>
-            {categoriesMap[entryType].map((cat) => (
-              <option key={cat}>{cat}</option>
+            {categories[entryType].map((cat) => (
+              <option key={cat.category_id} value={cat.category_id}>
+                {cat.name}
+              </option>
             ))}
           </select>
 
@@ -109,9 +150,9 @@ function AccountBookPage({ onLogout }) {
             ) : (
               filteredEntries.map((entry, idx) => (
                 <tr key={idx}>
-                  <td>{entry.type}</td>
-                  <td>{entry.category}</td>
-                  <td>{entry.amount}</td>
+                  <td>{entryTypeMap(entry.type)}</td>
+                  <td>{entry.category_name}</td>
+                  <td>{entry.amount.toLocaleString()}</td>
                   <td>{entry.note || "-"}</td>
                 </tr>
               ))
