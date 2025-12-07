@@ -1,128 +1,217 @@
-/* 전체 배경 */
-body {
+/* 전체 리셋 및 중앙 정렬 */
+* {
   margin: 0;
   padding: 0;
-  background-color: #f6f5f3; /* 밝은 따뜻한 톤 */
-  font-family: "Pretendard", sans-serif;
+  box-sizing: border-box;
 }
 
-/* 중앙 정렬용 컨테이너 */
-.container {
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", sans-serif;
+  background: #e8e8e8;
+}
+
+#root, .page-container {
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+  width: 100%;
+  padding: 20px;
 }
 
-/* 로그인/회원가입 박스 */
+/* 로그인 박스 */
 .login-box {
-  background: #ffffff;
+  background: white;
   padding: 40px;
-  width: 320px;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* 타이틀 */
 .title {
   text-align: center;
-  color: #444;
-  margin-bottom: 10px;
+  font-size: 24px;
   font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
 }
 
-/* 인풋 스타일 */
-.login-box input, .login-box select {
+.login-box input {
+  width: 100%;
   padding: 12px;
-  border: 1.5px solid #ddd;
-  border-radius: 10px;
-  font-size: 15px;
-  background-color: #fafafa;
-  transition: 0.2s;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
-.login-box input:focus, .login-box select:focus {
+.login-box input:focus {
   border-color: #d78f5a;
   outline: none;
-  background-color: #fff;
 }
 
-/* 버튼 */
 .login-box button {
+  width: 100%;
   padding: 12px;
-  background-color: #d78f5a;
+  background: #d78f5a;
   color: white;
   border: none;
-  border-radius: 10px;
-  font-size: 16px;
+  border-radius: 4px;
+  font-weight: 600;
   cursor: pointer;
-  transition: 0.2s;
+  margin-bottom: 10px;
 }
 
 .login-box button:hover {
-  background-color: #c47d4e;
+  background: #c67d48;
 }
 
-/* 로그인 성공 메시지 */
 .success-text {
   color: #d78f5a;
-  font-weight: 600;
-  margin-top: 8px;
   text-align: center;
-}
-
-/* 가계부 화면 */
-.accountbook-container {
-  width: 80%;
-  max-width: 900px;
-}
-
-.accountbook-container header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.accountbook-container .tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.accountbook-container .tabs button {
-  flex: 1;
-}
-
-.accountbook-container .summary {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 20px;
   font-weight: 600;
+  margin-top: 10px;
 }
 
-.accountbook-container .entry-form {
+/* 가계부 페이지 */
+.accountbook-page {
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* 상단 네비게이션 버튼 통일 */
+.top-nav {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
-  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.accountbook-container .entry-list {
+.nav-btn, .logout-btn {
+  padding: 10px 32px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 0.2s;
+}
+
+/* 비활성화 상태 */
+.nav-btn {
+  background: #888;
+  color: white;
+  border-color: #888;
+}
+
+.nav-btn:hover {
+  background: #777;
+  border-color: #777;
+}
+
+/* 활성화 상태 */
+.nav-btn.active {
+  background: #d78f5a;
+  color: white;
+  border-color: #d78f5a;
+}
+
+.nav-btn.active:hover {
+  background: #c67d48;
+  border-color: #c67d48;
+}
+
+/* 로그아웃 버튼 */
+.logout-btn {
+  background: #d78f5a;
+  color: white;
+  border-color: #d78f5a;
+}
+
+.logout-btn:hover {
+  background: #c67d48;
+  border-color: #c67d48;
+}
+
+/* 입력 영역 */
+.input-row {
   display: flex;
-  flex-direction: column;
   gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
+  align-items: center;
 }
 
-.entry-card {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  background-color: #fafafa;
-  border-radius: 10px;
-  border: 1px solid #ddd;
+.input-row select, .input-row input {
+  padding: 9px 12px;
+  border: 1px solid #999;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.input-row select {
+  min-width: 100px;
+  cursor: pointer;
+  background: white;
+}
+
+.input-row input {
+  width: 180px;
+}
+
+.input-row select:focus, .input-row input:focus {
+  border-color: #666;
+  outline: none;
+}
+
+.add-button {
+  padding: 9px 24px;
+  background: white;
+  border: 1px solid #999;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.add-button:hover {
+  background: #f5f5f5;
+}
+
+/* 테이블 */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border: 1px solid #999;
+}
+
+.data-table th, .data-table td {
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #999;
+  font-size: 14px;
+}
+
+.data-table tbody tr:hover {
+  background: #f9f9f9;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .top-nav {
+    flex-wrap: wrap;
+  }
+
+  .nav-btn, .logout-btn {
+    flex: 1 1 45%;
+  }
+
+  .input-row {
+    flex-wrap: wrap;
+  }
+
+  .input-row select, .input-row input, .add-button {
+    width: 100%;
+  }
 }
