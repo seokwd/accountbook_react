@@ -1,11 +1,10 @@
-// pages/AccountBookPage.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-function AccountBookPage({ onLogout }) {
+function AccountBookPage({ userId, onLogout }) {
   const [view, setView] = useState("수입");
   const [entryType, setEntryType] = useState("수입");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState(null);
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [entries, setEntries] = useState([]);
@@ -13,24 +12,64 @@ function AccountBookPage({ onLogout }) {
 
   const BASE_URL = "https://unlionised-unincreasing-axel.ngrok-free.dev";
 
-  // 서버에서 카테고리 불러오기
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/category`); // <- 수정된 URL
+        const res = await axios.get(`${BASE_URL}/category`, {
+          headers: { "ngrok-skip-browser-warning": "true" },
+        });
+
         const map = { 수입: [], 지출: [], 물품: [] };
-        res.data.forEach(cat => {
+        res.data.forEach((cat) => {
           if (cat.type === "income") map["수입"].push(cat);
           if (cat.type === "expense") map["지출"].push(cat);
           if (cat.type === "item") map["물품"].push(cat);
         });
+
         setCategories(map);
       } catch (err) {
-        console.error("카테고리 불러오기 실패:", err);
+        console.error("카테고리 조회 실패:", err);
       }
     };
+
     fetchCategories();
   }, []);
+
+  const fetchEntries = async () => {
+    if (!userId) return;
+
+    try {
+      const [incomeRes, expenseRes, itemRes] = await Promise.all([
+        axios.get(`${BASE_URL}/transaction/income/${userId}`, {
+          headers: { "ngrok-skip-browser-warning": "true" },
+        }),
+        axios.get(`${BASE_URL}/transaction/expense/${userId}`, {
+          headers: { "ngrok-skip-browser-warning": "true" },
+        }),
+        axios.get(`${BASE_URL}/transaction/item/${userId}`, {
+          headers: { "ngrok-skip-browser-warning": "true" },
+        }),
+      ]);
+
+      const incomes = Array.isArray(incomeRes.data)
+        ? incomeRes.data.map((v) => ({ ...v, type: "수입" }))
+        : [];
+      const expenses = Array.isArray(expenseRes.data)
+        ? expenseRes.data.map((v) => ({ ...v, type: "지출" }))
+        : [];
+      const items = Array.isArray(itemRes.data)
+        ? itemRes.data.map((v) => ({ ...v, type: "물품" }))
+        : [];
+
+      setEntries([...incomes, ...expenses, ...items]);
+    } catch (err) {
+      console.error("트랜잭션 조회 실패:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchEntries();
+  }, [userId]);
 
   const handleAdd = async () => {
     if (!category || !amount) {
@@ -39,38 +78,55 @@ function AccountBookPage({ onLogout }) {
     }
 
     try {
-      const categoryId = category.category_id; // 선택한 category 객체에서 ID
-      const newEntry = {
-        type: entryType,
-        category_id: categoryId,
-        amount: Number(amount),
-        note,
-      };
+      let url = "";
+      const payload = { user_id: userId, category_id: category.category_id, note };
 
-      const res = await axios.post(`${BASE_URL}/transactions`, newEntry);
-      setEntries([res.data, ...entries]);
-      setCategory("");
+      if (entryType === "수입") {
+        url = `${BASE_URL}/transaction/income`;
+        payload.amount = Number(amount);
+        payload.income_date = new Date().toISOString().slice(0, 10);
+      }
+
+      if (entryType === "지출") {
+        url = `${BASE_URL}/transaction/expense`;
+        payload.amount = Number(amount);
+        payload.expense_date = new Date().toISOString().slice(0, 10);
+      }
+
+      if (entryType === "물품") {
+        url = `${BASE_URL}/transaction/item`;
+        payload.name = note || "상품";
+        payload.price = Number(amount);
+        payload.quantity = 1;
+        payload.purchase_date = new Date().toISOString().slice(0, 10);
+      }
+
+      await axios.post(url, payload, {
+        headers: { "ngrok-skip-browser-warning": "true" },
+      });
+
+      await fetchEntries();
+
       setAmount("");
       setNote("");
+      setCategory(null);
     } catch (err) {
-      console.error("추가 실패:", err.response?.data || err);
-      alert("추가 실패!");
+      console.error("추가 실패:", err);
+      alert("추가 실패");
     }
   };
 
-  const entryTypeMap = (type) => {
-    if (type === "income") return "수입";
-    if (type === "expense") return "지출";
-    if (type === "item") return "물품";
-    return type;
-  };
+  const filteredEntries = entries.filter((e) => e.type === view);
 
-  const filteredEntries = entries.filter((e) => entryTypeMap(e.type) === view);
+  const getCategoryName = (entry) => {
+    const list = categories[entry.type] || [];
+    const found = list.find((c) => c.category_id === entry.category_id);
+    return found ? found.name : "-";
+  };
 
   return (
     <div className="page-container">
       <div className="accountbook-page">
-        {/* 상단 네비게이션 */}
         <div className="top-nav">
           {["수입", "지출", "물품"].map((tab) => (
             <button
@@ -86,21 +142,26 @@ function AccountBookPage({ onLogout }) {
           </button>
         </div>
 
-        {/* 입력 영역 */}
         <div className="input-row">
-          <select value={entryType} onChange={(e) => setEntryType(e.target.value)}>
+          <select
+            value={entryType}
+            onChange={(e) => {
+              setEntryType(e.target.value);
+              setCategory(null);
+            }}
+          >
             <option value="수입">수입</option>
             <option value="지출">지출</option>
             <option value="물품">물품</option>
           </select>
 
           <select
-            value={category.category_id || ""}
+            value={category?.category_id || ""}
             onChange={(e) => {
               const selected = categories[entryType].find(
                 (c) => c.category_id === Number(e.target.value)
               );
-              setCategory(selected);
+              setCategory(selected || null);
             }}
           >
             <option value="">선택</option>
@@ -130,7 +191,6 @@ function AccountBookPage({ onLogout }) {
           </button>
         </div>
 
-        {/* 테이블 */}
         <table className="data-table">
           <thead>
             <tr>
@@ -143,17 +203,17 @@ function AccountBookPage({ onLogout }) {
           <tbody>
             {filteredEntries.length === 0 ? (
               <tr>
-                <td colSpan="4" style={{ padding: "40px", color: "#999" }}>
+                <td colSpan="4" style={{ padding: "30px", color: "#999" }}>
                   등록된 내역이 없습니다
                 </td>
               </tr>
             ) : (
-              filteredEntries.map((entry, idx) => (
-                <tr key={idx}>
-                  <td>{entryTypeMap(entry.type)}</td>
-                  <td>{entry.category_name}</td>
-                  <td>{entry.amount.toLocaleString()}</td>
-                  <td>{entry.note || "-"}</td>
+              filteredEntries.map((e, i) => (
+                <tr key={i}>
+                  <td>{e.type}</td>
+                  <td>{getCategoryName(e)}</td>
+                  <td>{Number(e.amount || e.price).toLocaleString()}원</td>
+                  <td>{e.note || e.name || "-"}</td>
                 </tr>
               ))
             )}

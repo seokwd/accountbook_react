@@ -19,7 +19,8 @@ function LoginPage({ onLoginSuccess }) {
       });
       console.log("로그인 성공:", response.data);
       setSuccess(true);
-      onLoginSuccess();
+      // ✅ user_id를 받아서 그대로 전달
+      onLoginSuccess(response.data.user_id);
     } catch (error) {
       setSuccess(false);
       if (error.response?.data?.error) {
