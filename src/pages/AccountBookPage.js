@@ -11,26 +11,14 @@ function AccountBookPage({ userId, onLogout }) {
   const [categories, setCategories] = useState({ 수입: [], 지출: [], 물품: [] });
 
   const BASE_URL = "https://unlionised-unincreasing-axel.ngrok-free.dev";
-  const USER_ID = 1;
 
-<<<<<<< HEAD
-=======
-  // 카테고리 불러오기
->>>>>>> a64299535ed47aa89fc681b591e2ae2b4c784ff8
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await axios.get(`${BASE_URL}/category`, {
-<<<<<<< HEAD
           headers: { "ngrok-skip-browser-warning": "true" },
         });
 
-=======
-          headers: {
-            'ngrok-skip-browser-warning': 'true'
-          }
-        });
->>>>>>> a64299535ed47aa89fc681b591e2ae2b4c784ff8
         const map = { 수입: [], 지출: [], 물품: [] };
         res.data.forEach((cat) => {
           if (cat.type === "income") map["수입"].push(cat);
@@ -47,7 +35,6 @@ function AccountBookPage({ userId, onLogout }) {
     fetchCategories();
   }, []);
 
-<<<<<<< HEAD
   const fetchEntries = async () => {
     if (!userId) return;
 
@@ -84,17 +71,14 @@ function AccountBookPage({ userId, onLogout }) {
     fetchEntries();
   }, [userId]);
 
-=======
-  // 트랜잭션 추가
->>>>>>> a64299535ed47aa89fc681b591e2ae2b4c784ff8
   const handleAdd = async () => {
     if (!category || !amount) {
-      return alert("카테고리와 금액을 입력해주세요.");
+      alert("카테고리와 금액을 입력해주세요.");
+      return;
     }
 
     try {
       let url = "";
-<<<<<<< HEAD
       const payload = { user_id: userId, category_id: category.category_id, note };
 
       if (entryType === "수입") {
@@ -123,35 +107,6 @@ function AccountBookPage({ userId, onLogout }) {
 
       await fetchEntries();
 
-=======
-      const payload = { user_id: USER_ID, category_id: category.category_id, amount: Number(amount), note };
-
-      if (entryType === "수입") {
-        url = `${BASE_URL}/transaction/income`;
-        payload.income_date = new Date().toISOString().split("T")[0];
-      } else if (entryType === "지출") {
-        url = `${BASE_URL}/transaction/expense`;
-        payload.expense_date = new Date().toISOString().split("T")[0];
-      } else if (entryType === "물품") {
-        url = `${BASE_URL}/transaction/item`;
-        payload.name = note || "상품";
-        payload.price = Number(amount);
-        payload.purchase_date = new Date().toISOString().split("T")[0];
-        payload.quantity = 1;
-        delete payload.amount;
-      }
-
-      const res = await axios.post(url, payload, {
-        headers: {
-          'ngrok-skip-browser-warning': 'true'
-        }
-      });
-
-      const entryWithName = { ...res.data, category_name: category.name, type: entryTypeMap(entryType) };
-      setEntries([entryWithName, ...entries]);
-
-      setCategory(null);
->>>>>>> a64299535ed47aa89fc681b591e2ae2b4c784ff8
       setAmount("");
       setNote("");
       setCategory(null);
@@ -161,35 +116,19 @@ function AccountBookPage({ userId, onLogout }) {
     }
   };
 
-<<<<<<< HEAD
   const filteredEntries = entries.filter((e) => e.type === view);
 
   const getCategoryName = (entry) => {
     const list = categories[entry.type] || [];
     const found = list.find((c) => c.category_id === entry.category_id);
     return found ? found.name : "-";
-=======
-  const entryTypeMap = (type) => {
-    if (type === "income" || type === "수입") return "수입";
-    if (type === "expense" || type === "지출") return "지출";
-    if (type === "item" || type === "물품") return "물품";
-    return type;
-  };
-
-  const filteredEntries = entries.filter((e) => e.type === view);
-
-  const getCategoryName = (entry) => {
-    const typeKey = entryTypeMap(entry.type);
-    const cat = categories[typeKey].find(c => c.category_id === entry.category_id);
-    return cat ? cat.name : "-";
->>>>>>> a64299535ed47aa89fc681b591e2ae2b4c784ff8
   };
 
   return (
     <div className="page-container">
       <div className="accountbook-page">
         <div className="top-nav">
-          {["수입", "지출", "물품"].map(tab => (
+          {["수입", "지출", "물품"].map((tab) => (
             <button
               key={tab}
               className={`nav-btn ${view === tab ? "active" : ""}`}
@@ -204,7 +143,6 @@ function AccountBookPage({ userId, onLogout }) {
         </div>
 
         <div className="input-row">
-<<<<<<< HEAD
           <select
             value={entryType}
             onChange={(e) => {
@@ -212,9 +150,6 @@ function AccountBookPage({ userId, onLogout }) {
               setCategory(null);
             }}
           >
-=======
-          <select value={entryType} onChange={(e) => { setEntryType(e.target.value); setCategory(null); }}>
->>>>>>> a64299535ed47aa89fc681b591e2ae2b4c784ff8
             <option value="수입">수입</option>
             <option value="지출">지출</option>
             <option value="물품">물품</option>
@@ -224,13 +159,13 @@ function AccountBookPage({ userId, onLogout }) {
             value={category?.category_id || ""}
             onChange={(e) => {
               const selected = categories[entryType].find(
-                c => c.category_id === Number(e.target.value)
+                (c) => c.category_id === Number(e.target.value)
               );
               setCategory(selected || null);
             }}
           >
             <option value="">선택</option>
-            {categories[entryType].map(cat => (
+            {categories[entryType].map((cat) => (
               <option key={cat.category_id} value={cat.category_id}>
                 {cat.name}
               </option>
@@ -239,19 +174,21 @@ function AccountBookPage({ userId, onLogout }) {
 
           <input
             type="number"
-            placeholder={entryType === "물품" ? "가격" : "금액"}
+            placeholder="금액"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
           />
 
           <input
             type="text"
-            placeholder={entryType === "물품" ? "상품명/비고" : "비고"}
+            placeholder="비고"
             value={note}
             onChange={(e) => setNote(e.target.value)}
           />
 
-          <button className="add-button" onClick={handleAdd}>추가</button>
+          <button className="add-button" onClick={handleAdd}>
+            추가
+          </button>
         </div>
 
         <table className="data-table">
@@ -271,21 +208,12 @@ function AccountBookPage({ userId, onLogout }) {
                 </td>
               </tr>
             ) : (
-<<<<<<< HEAD
               filteredEntries.map((e, i) => (
                 <tr key={i}>
                   <td>{e.type}</td>
                   <td>{getCategoryName(e)}</td>
                   <td>{Number(e.amount || e.price).toLocaleString()}원</td>
                   <td>{e.note || e.name || "-"}</td>
-=======
-              filteredEntries.map((entry, idx) => (
-                <tr key={idx}>
-                  <td>{entry.type}</td>
-                  <td>{getCategoryName(entry)}</td>
-                  <td>{Number(entry.amount || entry.price || 0).toLocaleString()}원</td>
-                  <td>{entry.note || entry.name || "-"}</td>
->>>>>>> a64299535ed47aa89fc681b591e2ae2b4c784ff8
                 </tr>
               ))
             )}
