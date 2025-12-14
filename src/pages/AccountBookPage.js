@@ -60,9 +60,9 @@ function AccountBookPage({ userId, onLogout }) {
         ? itemRes.data.map((v) => ({ ...v, type: "물품" }))
         : [];
 
-      // 등록 순서대로 정렬 (created_at 기준)
+      // 최근 등록 순으로 내림차순 정렬 (created_at 기준)
       const allEntries = [...incomes, ...expenses, ...items].sort(
-        (a, b) => new Date(a.created_at) - new Date(b.created_at)
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
       );
 
       setEntries(allEntries);
@@ -215,8 +215,8 @@ function AccountBookPage({ userId, onLogout }) {
               padding: "20px",
               borderRadius: "8px",
               boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              height: "440px", // 물품 선택 시 높이 기준으로 고정
-              overflowY: "auto", // 내용이 많으면 스크롤
+              height: "440px",
+              overflowY: "auto",
             }}
           >
             <h3 style={{ marginBottom: "15px" }}>내역 추가</h3>
