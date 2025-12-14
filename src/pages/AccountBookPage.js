@@ -1,9 +1,8 @@
-// AccountBookPage.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 function AccountBookPage({ userId, onLogout }) {
-  const [view, setView] = useState("수입");
+  const [view, setView] = useState("전체"); // 기본값 전체
   const [entryType, setEntryType] = useState("수입");
   const [category, setCategory] = useState(null);
   const [amount, setAmount] = useState("");
@@ -39,15 +38,9 @@ function AccountBookPage({ userId, onLogout }) {
     if (!userId) return;
     try {
       const [incomeRes, expenseRes, itemRes] = await Promise.all([
-        axios.get(`${BASE_URL}/transaction/income/${userId}`, {
-          headers: { "ngrok-skip-browser-warning": "true" },
-        }),
-        axios.get(`${BASE_URL}/transaction/expense/${userId}`, {
-          headers: { "ngrok-skip-browser-warning": "true" },
-        }),
-        axios.get(`${BASE_URL}/transaction/item/${userId}`, {
-          headers: { "ngrok-skip-browser-warning": "true" },
-        }),
+        axios.get(`${BASE_URL}/transaction/income/${userId}`, { headers: { "ngrok-skip-browser-warning": "true" } }),
+        axios.get(`${BASE_URL}/transaction/expense/${userId}`, { headers: { "ngrok-skip-browser-warning": "true" } }),
+        axios.get(`${BASE_URL}/transaction/item/${userId}`, { headers: { "ngrok-skip-browser-warning": "true" } }),
       ]);
 
       const incomes = Array.isArray(incomeRes.data)
@@ -97,23 +90,19 @@ function AccountBookPage({ userId, onLogout }) {
         payload.expiration_date = expiration || null;
       }
 
-      await axios.post(url, payload, {
-        headers: { "ngrok-skip-browser-warning": "true" },
-      });
-
+      await axios.post(url, payload, { headers: { "ngrok-skip-browser-warning": "true" } });
       await fetchEntries();
-      setAmount("");
-      setNote("");
-      setCategory(null);
-      setQuantity(1);
-      setExpiration("");
+      setAmount(""); setNote(""); setCategory(null); setQuantity(1); setExpiration("");
     } catch (err) {
       console.error("추가 실패:", err);
       alert("추가 실패");
     }
   };
 
-  const filteredEntries = entries.filter((e) => e.type === view);
+  const filteredEntries =
+    view === "전체"
+      ? entries.filter((e) => e.type === "수입" || e.type === "지출")
+      : entries.filter((e) => e.type === view);
 
   const getCategoryName = (entry) => {
     const list = categories[entry.type] || [];
@@ -127,7 +116,7 @@ function AccountBookPage({ userId, onLogout }) {
         {/* 좌측 가계부 컨테이너 */}
         <div style={{ flex: 2, display: "flex", flexDirection: "column" }}>
           <div className="top-nav">
-            {["수입", "지출", "물품"].map((tab) => (
+            {["전체", "수입", "지출", "물품"].map((tab) => (
               <button
                 key={tab}
                 className={`nav-btn ${view === tab ? "active" : ""}`}
@@ -176,7 +165,16 @@ function AccountBookPage({ userId, onLogout }) {
         </div>
 
         {/* 우측 입력/추가 컨테이너 */}
-        <div style={{ flex: 1.5, minWidth: "300px", background: "white", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
+        <div
+          style={{
+            flex: 1.5,
+            minWidth: "300px",
+            background: "white",
+            padding: "20px",
+            borderRadius: "8px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          }}
+        >
           <h3 style={{ marginBottom: "15px" }}>내역 추가</h3>
           <div className="input-row" style={{ flexDirection: "column", alignItems: "stretch" }}>
             <select
