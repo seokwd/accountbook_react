@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import AccountBookPage from "./pages/AccountBookPage";
+import InitialBalancePage from "./pages/InitialBalancePage";
 import "./App.css";
 
 function App() {
@@ -16,14 +17,26 @@ function App() {
           path="/"
           element={
             isLoggedIn ? (
-              <Navigate to="/accountbook" />
+              <Navigate to="/initial-balance" />
             ) : (
               <LoginPage
                 onLoginSuccess={(id) => {
                   setIsLoggedIn(true);
-                  setUserId(id); // 로그인 성공 시 userId 저장
+                  setUserId(id);
                 }}
               />
+            )
+          }
+        />
+
+        {/* 초기자금 입력 페이지 (회원가입 후 한 번만 보임) */}
+        <Route
+          path="/initial-balance"
+          element={
+            isLoggedIn ? (
+              <InitialBalancePage userId={userId} />
+            ) : (
+              <Navigate to="/" />
             )
           }
         />
@@ -45,6 +58,3 @@ function App() {
 }
 
 export default App;
-
-
-//깃 푸시 풀 테스트 ------
