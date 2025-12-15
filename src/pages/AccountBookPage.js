@@ -178,7 +178,7 @@ function AccountBookPage({ userId, onLogout }) {
         </div>
 
         <div style={{ display: "flex", gap: "20px" }}>
-          {/* ✅ 좌측: 필터 + 가계부 통합 컨테이너 */}
+          {/* 좌측: 필터 + 가계부 통합 컨테이너 */}
           <div
             style={{
               flex: 2,
@@ -242,95 +242,122 @@ function AccountBookPage({ userId, onLogout }) {
             </table>
           </div>
 
-          {/* 우측: 입력/추가 컨테이너 */}
+          {/* 우측: 입력/추가 + 새 컨테이너 */}
           <div
             style={{
               flex: 1.5,
               minWidth: "300px",
-              background: "white",
-              padding: "20px",
-              borderRadius: "8px",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              height: "fit-content",
-              maxHeight: "600px",
-              overflowY: "auto",
+              display: "flex",
+              flexDirection: "column",
+              gap: "20px",
             }}
           >
-            <h3 style={{ marginBottom: "15px" }}>내역 추가</h3>
-            <div className="input-row" style={{ flexDirection: "column", alignItems: "stretch" }}>
-              <select
-                value={entryType}
-                onChange={(e) => {
-                  const newType = e.target.value;
-                  setEntryType(newType);
-                  setCategory(null);
-                  setAmount("");
-                  setNote("");
-                  setQuantity(1);
-                  setExpiration("");
-                }}
-              >
-                <option value="수입">수입</option>
-                <option value="지출">지출</option>
-                <option value="물품">물품</option>
-              </select>
+            {/* 기존 내역 추가 컨테이너 */}
+            <div
+              style={{
+                background: "white",
+                padding: "20px",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                height: "auto",
+                minHeight: "400px", // 물품 선택 시 충분한 높이 확보
+                maxHeight: "600px",
+                overflowY: "auto",
+              }}
+            >
+              <h3 style={{ marginBottom: "15px" }}>내역 추가</h3>
+              <div className="input-row" style={{ flexDirection: "column", alignItems: "stretch" }}>
+                <select
+                  value={entryType}
+                  onChange={(e) => {
+                    const newType = e.target.value;
+                    setEntryType(newType);
+                    setCategory(null);
+                    setAmount("");
+                    setNote("");
+                    setQuantity(1);
+                    setExpiration("");
+                  }}
+                >
+                  <option value="수입">수입</option>
+                  <option value="지출">지출</option>
+                  <option value="물품">물품</option>
+                </select>
 
-              <select
-                value={category?.category_id || ""}
-                onChange={(e) => {
-                  const selected = categories[entryType].find(
-                    (c) => c.category_id === Number(e.target.value)
-                  );
-                  setCategory(selected || null);
-                }}
-              >
-                <option value="">선택</option>
-                {categories[entryType].map((cat) => (
-                  <option key={cat.category_id} value={cat.category_id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+                <select
+                  value={category?.category_id || ""}
+                  onChange={(e) => {
+                    const selected = categories[entryType].find(
+                      (c) => c.category_id === Number(e.target.value)
+                    );
+                    setCategory(selected || null);
+                  }}
+                >
+                  <option value="">선택</option>
+                  {categories[entryType].map((cat) => (
+                    <option key={cat.category_id} value={cat.category_id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
 
-              <input
-                type="number"
-                placeholder="금액"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-              />
-              <input
-                type="text"
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                maxLength={10}
-                placeholder="비고 (최대 10자)"
-              />
+                <input
+                  type="number"
+                  placeholder="금액"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                />
+                <input
+                  type="text"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  maxLength={10}
+                  placeholder="비고 (최대 10자)"
+                />
 
-              {entryType === "물품" && (
-                <>
-                  <div style={{ position: "relative" }}>
+                {entryType === "물품" && (
+                  <>
+                    <div style={{ position: "relative" }}>
+                      <input
+                        type="number"
+                        placeholder="수량"
+                        value={quantity}
+                        onChange={(e) => setQuantity(e.target.value)}
+                        min="1"
+                        style={{ width: "100%" }}
+                      />
+                    </div>
+
                     <input
-                      type="number"
-                      placeholder="수량"
-                      value={quantity}
-                      onChange={(e) => setQuantity(e.target.value)}
-                      min="1"
-                      style={{ width: "100%" }}
+                      type="date"
+                      placeholder="유통기한"
+                      value={expiration}
+                      onChange={(e) => setExpiration(e.target.value)}
                     />
-                  </div>
+                  </>
+                )}
 
-                  <input
-                    type="date"
-                    placeholder="유통기한"
-                    value={expiration}
-                    onChange={(e) => setExpiration(e.target.value)}
-                  />
-                </>
-              )}
+                <button className="add-button" onClick={handleAdd} style={{ marginTop: "10px" }}>
+                  추가
+                </button>
+              </div>
+            </div>
 
-              <button className="add-button" onClick={handleAdd} style={{ marginTop: "10px" }}>
-                추가
-              </button>
+            {/* 새로 추가할 컨테이너 */}
+            <div
+              style={{
+                background: "white",
+                padding: "20px",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                height: "auto",
+                minHeight: "400px", // 기존 컨테이너와 동일
+                maxHeight: "600px",
+                overflowY: "auto",
+              }}
+            >
+              <h3 style={{ marginBottom: "15px" }}>이번달 예산</h3>
+              <p>여기에 새로운 내용 표시 가능</p>
             </div>
           </div>
         </div>
