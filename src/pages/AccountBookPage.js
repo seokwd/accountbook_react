@@ -14,7 +14,6 @@ function AccountBookPage({ userId, onLogout }) {
   const [categories, setCategories] = useState({ 수입: [], 지출: [], 물품: [] });
   const [initialBalance, setInitialBalance] = useState(0);
 
-
   const BASE_URL = "https://unlionised-unincreasing-axel.ngrok-free.dev";
 
   useEffect(() => {
@@ -62,7 +61,6 @@ function AccountBookPage({ userId, onLogout }) {
         ? itemRes.data.map((v) => ({ ...v, type: "물품" }))
         : [];
 
-      // 최근 등록 순으로 내림차순 정렬 (created_at 기준)
       const allEntries = [...incomes, ...expenses, ...items].sort(
         (a, b) => new Date(b.created_at) - new Date(a.created_at)
       );
@@ -78,26 +76,21 @@ function AccountBookPage({ userId, onLogout }) {
   }, [userId]);
 
   useEffect(() => {
-  if (!userId) return;
+    if (!userId) return;
 
-  const fetchInitialBalance = async () => {
-    try {
-      const res = await axios.get(
-        `https://unlionised-unincreasing-axel.ngrok-free.dev/balance/${userId}`,
-        {
+    const fetchInitialBalance = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/balance/${userId}`, {
           headers: { "ngrok-skip-browser-warning": "true" },
-        }
-      );
+        });
+        setInitialBalance(Number(res.data.current_balance || 0));
+      } catch (err) {
+        console.error("초기 잔액 조회 실패", err);
+      }
+    };
 
-      setInitialBalance(Number(res.data.current_balance || 0));
-    } catch (err) {
-      console.error("초기 잔액 조회 실패", err);
-    }
-  };
-
-  fetchInitialBalance();
-}, [userId]);
-
+    fetchInitialBalance();
+  }, [userId]);
 
   const handleAdd = async () => {
     if (!category || !amount) {
@@ -142,7 +135,6 @@ function AccountBookPage({ userId, onLogout }) {
     }
   };
 
-  // 전체금액 계산 (수입-지출, 물품 제외)
   const transactionTotal = entries.reduce((sum, e) => {
     if (e.type === "수입") return sum + Number(e.amount);
     if (e.type === "지출") return sum - Number(e.amount);
@@ -163,8 +155,8 @@ function AccountBookPage({ userId, onLogout }) {
 
   const getRowStyle = (entry) => {
     if (view === "전체") {
-      if (entry.type === "수입") return { backgroundColor: "#d4edda" }; // 연두
-      if (entry.type === "지출") return { backgroundColor: "#f8d7da" }; // 빨강
+      if (entry.type === "수입") return { backgroundColor: "#d4edda" };
+      if (entry.type === "지출") return { backgroundColor: "#f8d7da" };
     }
     return {};
   };
@@ -176,20 +168,30 @@ function AccountBookPage({ userId, onLogout }) {
     return "";
   };
 
-
   return (
     <div className="page-container">
       <div className="accountbook-page" style={{ display: "flex", gap: "20px", flexDirection: "column" }}>
-        {/* 상단 전체금액 컨테이너 */}
+        {/* 상단 전체금액 */}
         <div className="balance-summary" style={{ marginBottom: "20px", textAlign: "center" }}>
           <h3>전체 금액</h3>
           <p style={{ fontSize: "20px", fontWeight: "bold" }}>{totalAmount.toLocaleString()}원</p>
         </div>
 
-        {/* 좌측 가계부 컨테이너 */}
         <div style={{ display: "flex", gap: "20px" }}>
-          <div style={{ flex: 2, display: "flex", flexDirection: "column" }}>
-            <div className="top-nav">
+          {/* ✅ 좌측: 필터 + 가계부 통합 컨테이너 */}
+          <div
+            style={{
+              flex: 2,
+              background: "white",
+              padding: "20px",
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            {/* 필터 버튼 */}
+            <div className="top-nav" style={{ marginBottom: "20px" }}>
               {["전체", "수입", "지출", "물품"].map((tab) => (
                 <button
                   key={tab}
@@ -199,11 +201,9 @@ function AccountBookPage({ userId, onLogout }) {
                   {tab}
                 </button>
               ))}
-              <button className="logout-btn" onClick={onLogout}>
-                로그아웃
-              </button>
             </div>
 
+            {/* 테이블 */}
             <table className="data-table">
               <thead>
                 <tr>
@@ -219,7 +219,7 @@ function AccountBookPage({ userId, onLogout }) {
               <tbody>
                 {filteredEntries.length === 0 ? (
                   <tr>
-                    <td colSpan={view === "물품" ? "6" : "4"} style={{ padding: "30px", color: "#999" }}>
+                    <td colSpan={view === "물품" ? "7" : "5"} style={{ padding: "30px", color: "#999" }}>
                       등록된 내역이 없습니다
                     </td>
                   </tr>
@@ -233,7 +233,7 @@ function AccountBookPage({ userId, onLogout }) {
                       <td>{e.note || e.name || "-"}</td>
                       {view === "물품" && <td>{e.quantity}</td>}
                       {view === "물품" && (
-                      <td>{e.expiration_date ? e.expiration_date.slice(0, 10) : "-"}</td>
+                        <td>{e.expiration_date ? e.expiration_date.slice(0, 10) : "-"}</td>
                       )}
                     </tr>
                   ))
@@ -242,7 +242,7 @@ function AccountBookPage({ userId, onLogout }) {
             </table>
           </div>
 
-          {/* 우측 입력/추가 컨테이너 */}
+          {/* 우측: 입력/추가 컨테이너 */}
           <div
             style={{
               flex: 1.5,
@@ -251,7 +251,8 @@ function AccountBookPage({ userId, onLogout }) {
               padding: "20px",
               borderRadius: "8px",
               boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              height: "440px",
+              height: "fit-content",
+              maxHeight: "600px",
               overflowY: "auto",
             }}
           >
@@ -301,21 +302,21 @@ function AccountBookPage({ userId, onLogout }) {
                 type="text"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                maxLength={10}   // ← 여기
+                maxLength={10}
                 placeholder="비고 (최대 10자)"
               />
 
               {entryType === "물품" && (
                 <>
-                  <div className="quantity-wrapper">
-                  <input
-                    type="number"
-                    placeholder="수량"
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
-                    min="1"
-                  />
-                  <span className="quantity-label">*수량</span>
+                  <div style={{ position: "relative" }}>
+                    <input
+                      type="number"
+                      placeholder="수량"
+                      value={quantity}
+                      onChange={(e) => setQuantity(e.target.value)}
+                      min="1"
+                      style={{ width: "100%" }}
+                    />
                   </div>
 
                   <input
