@@ -143,8 +143,8 @@ function AccountBookPage({ userId, onLogout }) {
 
   const totalAmount = initialBalance + transactionTotal;
 
-  const filteredEntries = view === "전체"
-    ? entries.filter((e) => e.type === "수입" || e.type === "지출")
+  const filteredEntries = view === "전체" || view === "삭제"
+    ? entries.filter((e) => e.type === "수입" || e.type === "지출" || e.type === "물품")
     : entries.filter((e) => e.type === view);
 
   const getCategoryName = (entry) => {
@@ -154,7 +154,7 @@ function AccountBookPage({ userId, onLogout }) {
   };
 
   const getRowStyle = (entry) => {
-    if (view === "전체") {
+    if (view === "전체" || view === "삭제") {
       if (entry.type === "수입") return { backgroundColor: "#d4edda" };
       if (entry.type === "지출") return { backgroundColor: "#f8d7da" };
     }
@@ -171,14 +171,13 @@ function AccountBookPage({ userId, onLogout }) {
   return (
     <div className="page-container">
       <div className="accountbook-page" style={{ display: "flex", gap: "20px", flexDirection: "column" }}>
-        {/* 상단 전체금액 */}
         <div className="balance-summary" style={{ marginBottom: "20px", textAlign: "center" }}>
           <h3>전체 금액</h3>
           <p style={{ fontSize: "20px", fontWeight: "bold" }}>{totalAmount.toLocaleString()}원</p>
         </div>
 
         <div style={{ display: "flex", gap: "20px" }}>
-          {/* 좌측: 필터 + 가계부 통합 컨테이너 */}
+          {/* 좌측: 필터 + 테이블 */}
           <div
             style={{
               flex: 2,
@@ -190,20 +189,42 @@ function AccountBookPage({ userId, onLogout }) {
               flexDirection: "column",
             }}
           >
-            {/* 필터 버튼 */}
-            <div className="top-nav" style={{ marginBottom: "20px" }}>
-              {["전체", "수입", "지출", "물품"].map((tab) => (
+            <div
+              className="top-nav"
+              style={{
+                display: "flex",
+                gap: "10px",
+                borderBottom: "2px solid #ddd",
+                paddingBottom: "5px",
+                marginBottom: "20px",
+              }}
+            >
+              {["전체", "수입", "지출", "물품", "삭제"].map((tab) => (
                 <button
                   key={tab}
-                  className={`nav-btn ${view === tab ? "active" : ""}`}
                   onClick={() => setView(tab)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    padding: "10px 15px",
+                    cursor: "pointer",
+                    fontWeight: view === tab ? "bold" : "normal",
+                    color: view === tab ? "#007bff" : "#333",
+                    borderBottom: view === tab ? "3px solid #007bff" : "3px solid transparent",
+                    transition: "color 0.2s, border-bottom 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = "#0056b3";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = view === tab ? "#007bff" : "#333";
+                  }}
                 >
                   {tab}
                 </button>
               ))}
             </div>
 
-            {/* 테이블 */}
             <table className="data-table">
               <thead>
                 <tr>
@@ -212,14 +233,15 @@ function AccountBookPage({ userId, onLogout }) {
                   <th>카테고리</th>
                   <th>금액</th>
                   <th>비고</th>
-                  {view === "물품" && <th>수량</th>}
-                  {view === "물품" && <th>유통기한</th>}
+                  {view !== "삭제" && (view === "물품" ? <th>수량</th> : null)}
+                  {view !== "삭제" && (view === "물품" ? <th>유통기한</th> : null)}
+                  {view === "삭제" && <th>삭제</th>}
                 </tr>
               </thead>
               <tbody>
                 {filteredEntries.length === 0 ? (
                   <tr>
-                    <td colSpan={view === "물품" ? "7" : "5"} style={{ padding: "30px", color: "#999" }}>
+                    <td colSpan={view === "물품" || view === "삭제" ? 7 : 5} style={{ padding: "30px", color: "#999" }}>
                       등록된 내역이 없습니다
                     </td>
                   </tr>
@@ -231,9 +253,17 @@ function AccountBookPage({ userId, onLogout }) {
                       <td>{getCategoryName(e)}</td>
                       <td>{Number(e.amount || e.price).toLocaleString()}원</td>
                       <td>{e.note || e.name || "-"}</td>
-                      {view === "물품" && <td>{e.quantity}</td>}
-                      {view === "물품" && (
-                        <td>{e.expiration_date ? e.expiration_date.slice(0, 10) : "-"}</td>
+                      {view !== "삭제" && (view === "물품") && <td>{e.quantity}</td>}
+                      {view !== "삭제" && (view === "물품") && <td>{e.expiration_date ? e.expiration_date.slice(0, 10) : "-"}</td>}
+                      {view === "삭제" && (
+                        <td>
+                          <button
+                            style={{ color: "black", cursor: "pointer", border: "none", background: "transparent" }}
+                            onClick={() => alert("삭제 API 연결 필요")}
+                          >
+                            X
+                          </button>
+                        </td>
                       )}
                     </tr>
                   ))
@@ -242,7 +272,7 @@ function AccountBookPage({ userId, onLogout }) {
             </table>
           </div>
 
-          {/* 우측: 입력/추가 + 새 컨테이너 */}
+          {/* 우측: 입력/추가 + 예산 */}
           <div
             style={{
               flex: 1.5,
@@ -252,7 +282,6 @@ function AccountBookPage({ userId, onLogout }) {
               gap: "20px",
             }}
           >
-            {/* 기존 내역 추가 컨테이너 */}
             <div
               style={{
                 background: "white",
@@ -260,7 +289,7 @@ function AccountBookPage({ userId, onLogout }) {
                 borderRadius: "8px",
                 boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                 height: "auto",
-                minHeight: "400px", // 물품 선택 시 충분한 높이 확보
+                minHeight: "400px",
                 maxHeight: "600px",
                 overflowY: "auto",
               }}
@@ -343,7 +372,6 @@ function AccountBookPage({ userId, onLogout }) {
               </div>
             </div>
 
-            {/* 새로 추가할 컨테이너 */}
             <div
               style={{
                 background: "white",
@@ -351,13 +379,13 @@ function AccountBookPage({ userId, onLogout }) {
                 borderRadius: "8px",
                 boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                 height: "auto",
-                minHeight: "400px", // 기존 컨테이너와 동일
+                minHeight: "400px",
                 maxHeight: "600px",
                 overflowY: "auto",
               }}
             >
               <h3 style={{ marginBottom: "15px" }}>이번달 예산</h3>
-              <p>여기에 새로운 내용 표시 가능</p>
+              <p>예상 금액 및 계획을 표시</p>
             </div>
           </div>
         </div>
