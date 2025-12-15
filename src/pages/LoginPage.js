@@ -59,7 +59,7 @@ function LoginPage({ onLoginSuccess }) {
   };
 
   return (
-    <div className="page-container">
+    <div className="centered-page-container">
       <form
         className="login-box"
         onSubmit={isSignup ? handleSignup : handleLogin}

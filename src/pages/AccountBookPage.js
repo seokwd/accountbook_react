@@ -12,6 +12,8 @@ function AccountBookPage({ userId, onLogout }) {
   const [expiration, setExpiration] = useState("");
   const [entries, setEntries] = useState([]);
   const [categories, setCategories] = useState({ 수입: [], 지출: [], 물품: [] });
+  const [initialBalance, setInitialBalance] = useState(0);
+
 
   const BASE_URL = "https://unlionised-unincreasing-axel.ngrok-free.dev";
 
@@ -75,6 +77,28 @@ function AccountBookPage({ userId, onLogout }) {
     fetchEntries();
   }, [userId]);
 
+  useEffect(() => {
+  if (!userId) return;
+
+  const fetchInitialBalance = async () => {
+    try {
+      const res = await axios.get(
+        `https://unlionised-unincreasing-axel.ngrok-free.dev/balance/${userId}`,
+        {
+          headers: { "ngrok-skip-browser-warning": "true" },
+        }
+      );
+
+      setInitialBalance(Number(res.data.current_balance || 0));
+    } catch (err) {
+      console.error("초기 잔액 조회 실패", err);
+    }
+  };
+
+  fetchInitialBalance();
+}, [userId]);
+
+
   const handleAdd = async () => {
     if (!category || !amount) {
       alert("카테고리와 금액을 입력해주세요.");
@@ -119,13 +143,13 @@ function AccountBookPage({ userId, onLogout }) {
   };
 
   // 전체금액 계산 (수입-지출, 물품 제외)
-  const totalAmount = entries
-    .filter((e) => e.type === "수입" || e.type === "지출")
-    .reduce((sum, e) => {
-      if (e.type === "수입") return sum + Number(e.amount);
-      if (e.type === "지출") return sum - Number(e.amount);
-      return sum;
-    }, 0);
+  const transactionTotal = entries.reduce((sum, e) => {
+    if (e.type === "수입") return sum + Number(e.amount);
+    if (e.type === "지출") return sum - Number(e.amount);
+    return sum;
+  }, 0);
+
+  const totalAmount = initialBalance + transactionTotal;
 
   const filteredEntries = view === "전체"
     ? entries.filter((e) => e.type === "수입" || e.type === "지출")
@@ -144,6 +168,14 @@ function AccountBookPage({ userId, onLogout }) {
     }
     return {};
   };
+
+  const getEntryDate = (entry) => {
+    if (entry.type === "수입") return entry.income_date;
+    if (entry.type === "지출") return entry.expense_date;
+    if (entry.type === "물품") return entry.purchase_date;
+    return "";
+  };
+
 
   return (
     <div className="page-container">
@@ -176,6 +208,7 @@ function AccountBookPage({ userId, onLogout }) {
               <thead>
                 <tr>
                   <th>항목</th>
+                  <th>날짜</th>
                   <th>카테고리</th>
                   <th>금액</th>
                   <th>비고</th>
@@ -194,11 +227,14 @@ function AccountBookPage({ userId, onLogout }) {
                   filteredEntries.map((e, i) => (
                     <tr key={i} style={getRowStyle(e)}>
                       <td>{e.type}</td>
+                      <td>{getEntryDate(e)?.slice(0, 10)}</td>
                       <td>{getCategoryName(e)}</td>
                       <td>{Number(e.amount || e.price).toLocaleString()}원</td>
                       <td>{e.note || e.name || "-"}</td>
                       {view === "물품" && <td>{e.quantity}</td>}
-                      {view === "물품" && <td>{e.expiration_date || "-"}</td>}
+                      {view === "물품" && (
+                      <td>{e.expiration_date ? e.expiration_date.slice(0, 10) : "-"}</td>
+                      )}
                     </tr>
                   ))
                 )}
@@ -263,20 +299,25 @@ function AccountBookPage({ userId, onLogout }) {
               />
               <input
                 type="text"
-                placeholder="비고"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
+                maxLength={10}   // ← 여기
+                placeholder="비고 (최대 10자)"
               />
 
               {entryType === "물품" && (
                 <>
+                  <div className="quantity-wrapper">
                   <input
                     type="number"
-                    min="1"
                     placeholder="수량"
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
+                    min="1"
                   />
+                  <span className="quantity-label">*수량</span>
+                  </div>
+
                   <input
                     type="date"
                     placeholder="유통기한"
