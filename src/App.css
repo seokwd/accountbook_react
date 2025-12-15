@@ -1,4 +1,4 @@
-/* 전체 리셋 및 중앙 정렬 */
+/* 전체 리셋 */
 * {
   margin: 0;
   padding: 0;
@@ -11,11 +11,23 @@ html, body {
   background: #e8e8e8;
 }
 
-#root, .page-container {
+/* =========================
+   로그인 / 회원가입 / 초기자금
+   화면 중앙 정렬 전용
+========================= */
+.centered-page-container {
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: flex-start;;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+}
+
+/* =========================
+   가계부 페이지 (기존 그대로)
+========================= */
+.page-container {
   width: 100%;
   padding: 20px;
 }
@@ -78,9 +90,10 @@ html, body {
 .accountbook-page {
   width: 100%;
   max-width: 1200px;
+  margin: 0 auto;
 }
 
-/* 상단 네비게이션 버튼 통일 */
+/* 상단 네비 */
 .top-nav {
   display: flex;
   gap: 10px;
@@ -98,7 +111,6 @@ html, body {
   transition: all 0.2s;
 }
 
-/* 비활성화 상태 */
 .nav-btn {
   background: #888;
   color: white;
@@ -107,31 +119,17 @@ html, body {
 
 .nav-btn:hover {
   background: #777;
-  border-color: #777;
 }
 
-/* 활성화 상태 */
 .nav-btn.active {
   background: #d78f5a;
-  color: white;
   border-color: #d78f5a;
 }
 
-.nav-btn.active:hover {
-  background: #c67d48;
-  border-color: #c67d48;
-}
-
-/* 로그아웃 버튼 */
 .logout-btn {
   background: #d78f5a;
   color: white;
   border-color: #d78f5a;
-}
-
-.logout-btn:hover {
-  background: #c67d48;
-  border-color: #c67d48;
 }
 
 /* 입력 영역 */
@@ -139,30 +137,14 @@ html, body {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
-  justify-content: center;
-  align-items: center;
 }
 
-.input-row select, .input-row input {
+.input-row select,
+.input-row input {
   padding: 9px 12px;
   border: 1px solid #999;
   border-radius: 4px;
   font-size: 14px;
-}
-
-.input-row select {
-  min-width: 100px;
-  cursor: pointer;
-  background: white;
-}
-
-.input-row input {
-  width: 180px;
-}
-
-.input-row select:focus, .input-row input:focus {
-  border-color: #666;
-  outline: none;
 }
 
 .add-button {
@@ -170,12 +152,7 @@ html, body {
   background: white;
   border: 1px solid #999;
   border-radius: 4px;
-  font-weight: 500;
   cursor: pointer;
-}
-
-.add-button:hover {
-  background: #f5f5f5;
 }
 
 /* 테이블 */
@@ -186,7 +163,8 @@ html, body {
   border: 1px solid #999;
 }
 
-.data-table th, .data-table td {
+.data-table th,
+.data-table td {
   padding: 12px;
   text-align: center;
   border: 1px solid #999;
@@ -203,7 +181,8 @@ html, body {
     flex-wrap: wrap;
   }
 
-  .nav-btn, .logout-btn {
+  .nav-btn,
+  .logout-btn {
     flex: 1 1 45%;
   }
 
@@ -211,14 +190,9 @@ html, body {
     flex-wrap: wrap;
   }
 
-  .input-row select, .input-row input, .add-button {
+  .input-row select,
+  .input-row input,
+  .add-button {
     width: 100%;
-  }
-  .centered-page-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #f5f5f5;
   }
 }

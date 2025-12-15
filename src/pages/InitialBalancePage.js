@@ -16,7 +16,6 @@ function InitialBalancePage({ userId }) {
           headers: { "ngrok-skip-browser-warning": "true" },
         });
 
-        // 초기자금이 이미 입력되어 있으면 바로 가계부 페이지로 이동
         if (res.data.current_balance && res.data.current_balance > 0) {
           navigate("/accountbook");
         } else {
@@ -55,7 +54,7 @@ function InitialBalancePage({ userId }) {
   if (loading) return <div>로딩 중...</div>;
 
   return (
-    <div className="page-container">
+    <div className="centered-page-container">
       <div className="login-box">
         <h2 className="title">초기 자금 입력</h2>
         <form onSubmit={handleSubmit}>

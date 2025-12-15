@@ -17,17 +17,11 @@ function LoginPage({ onLoginSuccess }) {
         email: id,
         password: pw,
       });
-      console.log("로그인 성공:", response.data);
       setSuccess(true);
-      // ✅ user_id를 받아서 그대로 전달
       onLoginSuccess(response.data.user_id);
     } catch (error) {
       setSuccess(false);
-      if (error.response?.data?.error) {
-        alert(error.response.data.error);
-      } else {
-        alert("서버 연결 오류!");
-      }
+      alert(error.response?.data?.error || "서버 연결 오류!");
     }
   };
 
@@ -50,11 +44,7 @@ function LoginPage({ onLoginSuccess }) {
       setPw("");
       setSuccess(false);
     } catch (error) {
-      if (error.response?.data?.error) {
-        alert(error.response.data.error);
-      } else {
-        alert("서버 연결 오류!");
-      }
+      alert(error.response?.data?.error || "서버 연결 오류!");
     }
   };
 
