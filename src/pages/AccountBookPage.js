@@ -204,9 +204,19 @@ function AccountBookPage({ userId, onLogout }) {
   return (
     <div className="page-container">
       <div className="accountbook-page" style={{ display: "flex", gap: "20px", flexDirection: "column" }}>
-        <div className="balance-summary" style={{ marginBottom: "20px", textAlign: "center" }}>
-          <h3>전체 금액</h3>
-          <p style={{ fontSize: "20px", fontWeight: "bold" }}>{totalAmount.toLocaleString()}원</p>
+        <div style={{
+          display: "inline-block", // 텍스트 크기에 맞춤
+          padding: "20px",
+          borderRadius: "8px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          textAlign: "center",
+          background: "white",
+          marginBottom: "20px"
+        }}>
+          <h3 style={{ margin: "0 0 10px 0" }}>전체 금액</h3>
+          <p style={{ fontSize: "20px", fontWeight: "bold", margin: 0 }}>
+            {totalAmount.toLocaleString()}원
+          </p>
         </div>
 
         <div style={{ display: "flex", gap: "20px" }}>
@@ -271,7 +281,7 @@ function AccountBookPage({ userId, onLogout }) {
               <h3 style={{ marginBottom: "15px", fontSize: "18px", fontWeight: "600" }}>내역 추가</h3>
               
               <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                {/* 유형 선택 */}
+                {/* 항목 선택 */}
                 <div>
                   <label style={{ display: "block", marginBottom: "5px", fontSize: "14px", fontWeight: "500" }}>
                     항목
